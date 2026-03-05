@@ -16,21 +16,8 @@
       perSystem =
         { pkgs, ... }:
         {
-          devShells.default = pkgs.mkShell {
-            packages = [
-              (pkgs.python3.withPackages (
-                pp: with pp; [
-                  numpy
-                  matplotlib
-                  pandas
-                  openpyxl
-                  jupyter
-                  ipympl
-                  (torch.override { cudaSupport = true; })
-                ]
-              ))
-            ];
-          };
+          devShells.default = pkgs.callPackage ./shell.nix {};
+          devShells.cuda = pkgs.callPackage ./shell.nix { cudaSupport = true; };
         };
     };
 }
