@@ -8,6 +8,9 @@ mkShell {
   packages = [
     (pkgs.python3.withPackages (
       pp:
+      let
+        torch = pp.torch.override { inherit cudaSupport; };
+      in
       with pp;
       [
         numpy
@@ -16,8 +19,12 @@ mkShell {
         openpyxl
         jupyter
         ipympl
-        (torch.override { inherit cudaSupport; })
+        torch
         datasets
+        requests
+        aiohttp
+        sentencepiece
+        (transformers.override { inherit torch; })
       ]
     ))
   ];
