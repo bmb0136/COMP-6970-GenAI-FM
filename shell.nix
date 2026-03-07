@@ -6,6 +6,8 @@
 }:
 mkShell {
   packages = [
+    pkgs.wget
+    pkgs.protobuf
     (pkgs.python3.withPackages (
       pp:
       let
@@ -24,6 +26,8 @@ mkShell {
         requests
         aiohttp
         sentencepiece
+        protobuf
+        wget
         (transformers.override { inherit torch; })
         (accelerate.override { inherit torch; })
       ]
