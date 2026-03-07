@@ -25,6 +25,7 @@ mkShell {
         aiohttp
         sentencepiece
         (transformers.override { inherit torch; })
+        (accelerate.override { inherit torch; })
       ]
     ))
   ];

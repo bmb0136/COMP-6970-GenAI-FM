@@ -1,3 +1,5 @@
 corpus.txt
 tokenizer.model
 tokenizer.vocab
+pretrained/
+pretraining/
