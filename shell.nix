@@ -12,6 +12,9 @@ mkShell {
       pp:
       let
         torch = pp.torch.override { inherit cudaSupport; };
+        accelerate = pp.accelerate.override { inherit torch; };
+        transformers = pp.transformers.override { inherit torch; };
+        trl = pp.trl.override { inherit accelerate transformers; };
       in
       with pp;
       [
@@ -28,8 +31,9 @@ mkShell {
         sentencepiece
         protobuf
         wget
-        (transformers.override { inherit torch; })
-        (accelerate.override { inherit torch; })
+        trl
+        transformers
+        accelerate
       ]
     ))
   ];
