@@ -22,8 +22,7 @@ def format_prompt(ingredients, title, directions, **kwargs):
     text = "## Title: " + title + "\n\n"  + "## Directions:\n" + "\n".join(f"- {d}" for d in directions)
     return { "prompt": prompt, "completion": text }
 
-dataset = raw_ds \
-    .select(range(1000)) \
+dataset = raw_ds.select(range(25_000)) \
     .filter(lambda row: all(row[key] is not None for key in ["NER", "directions", "title"])) \
     .map(lambda row: format_prompt(**preproc(**row)), remove_columns=raw_ds.column_names) \
     .train_test_split(test_size=0.2)
@@ -41,12 +40,11 @@ args = TrainingArguments(
     save_strategy="steps",
     save_steps=50,
     logging_steps=50,
-    num_train_epochs=100,
+    num_train_epochs=50,
     logging_dir='sft_logs',
     fp16=torch.cuda.is_available(),
     load_best_model_at_end=True,
     metric_for_best_model="eval_loss",
-    torch_empty_cache_steps=50,
     report_to="none"
 )
 
