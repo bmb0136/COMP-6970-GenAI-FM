@@ -2,3 +2,4 @@ sft_*/
 sft_loss.csv
 loss.png
 __pycache__
+eval_*.csv
