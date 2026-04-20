@@ -1,33 +1,14 @@
-import datasets
-from transformers import (
-    AutoTokenizer, AutoModelForCausalLM,
-    TrainingArguments, Trainer, EarlyStoppingCallback,
-    DataCollatorWithPadding
-)
+from transformers import AutoModelForCausalLM, TrainingArguments, EarlyStoppingCallback
 import torch
-import json
 from trl import SFTTrainer
 import pandas as pd
+from data import load_recipe_nlg
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Torch device: {device}")
 
-raw_ds = datasets.load_dataset("innovate-data/RecipeNLG", data_files=["RecipeNLG_dataset.csv"], split="train").shuffle(seed=67)
+dataset = load_recipe_nlg(15_000, seed=67, as_prompts=True)
 
-def preproc(NER, title, directions, **kwargs):
-    return { "ingredients": json.loads(NER), "title": title, "directions": json.loads(directions) }
-
-def format_prompt(ingredients, title, directions, **kwargs):
-    prompt = "## Ingredients:\n" + "\n".join(f"- {i}" for i in ingredients)
-    text = "## Title: " + title + "\n\n"  + "## Directions:\n" + "\n".join(f"- {d}" for d in directions)
-    return { "prompt": prompt, "completion": text }
-
-dataset = raw_ds.select(range(25_000)) \
-    .filter(lambda row: all(row[key] is not None for key in ["NER", "directions", "title"])) \
-    .map(lambda row: format_prompt(**preproc(**row)), remove_columns=raw_ds.column_names) \
-    .train_test_split(test_size=0.2)
-
-#base_name = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 base_name = "distilgpt2"
 
 args = TrainingArguments(
@@ -36,12 +17,12 @@ args = TrainingArguments(
     gradient_accumulation_steps=16,
     output_dir="sft_ckpt",
     eval_strategy="steps",
+    learning_rate=1e-4,
     eval_steps=50,
     save_strategy="steps",
-    save_steps=50,
+    save_steps=250,
     logging_steps=50,
-    num_train_epochs=50,
-    logging_dir='sft_logs',
+    num_train_epochs=67, # We have early stopping enabled, so just run until that happens
     fp16=torch.cuda.is_available(),
     load_best_model_at_end=True,
     metric_for_best_model="eval_loss",
