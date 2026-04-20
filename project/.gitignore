@@ -1,5 +1,6 @@
 sft_*/
 sft_loss.csv
 loss.png
+issues.png
 __pycache__
 eval_*.csv
