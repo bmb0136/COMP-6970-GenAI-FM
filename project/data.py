@@ -1,7 +1,7 @@
 import datasets
 import json
 
-def preproc(ingredients, title, directions, **kwargs):
+def preproc(NER, title, directions, **kwargs):
     # Some recipes in the dataset have multiple directions on one line
     # Split them into multiple steps
     directions = [
