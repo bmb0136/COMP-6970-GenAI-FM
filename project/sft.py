@@ -1,4 +1,4 @@
-from transformers import AutoModelForCausalLM, TrainingArguments, EarlyStoppingCallback
+from transformers import AutoModelForCausalLM, TrainingArguments, EarlyStoppingCallback, BitsAndBytesConfig
 import torch
 from trl import SFTTrainer
 import pandas as pd
@@ -9,7 +9,7 @@ print(f"Torch device: {device}")
 
 dataset = load_recipe_nlg(15_000, seed=67, as_prompts=True)
 
-base_name = "distilgpt2"
+base_name = "HuggingFaceTB/SmolLM2-135M"
 
 args = TrainingArguments(
     per_device_train_batch_size=2,
