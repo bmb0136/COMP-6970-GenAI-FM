@@ -9,7 +9,7 @@ print(f"Torch device: {device}")
 
 tokenizer = AutoTokenizer.from_pretrained("HuggingFaceTB/SmolLM2-135M")
 
-dataset = load_recipe_nlg(500, seed=420)["train"]
+dataset = load_recipe_nlg(625, seed=420)["train"]
 
 def generate(model, prompt):
     inputs = tokenizer([prompt], return_tensors="pt").to(model.device)
@@ -38,24 +38,29 @@ def parse(text: str) -> ParsedResponse:
                     title = line[line.index(":") + 1:].strip()
                     state = "find_directions"
                 else:
-                    issues.append(f"L{i + 1}: expected directions header")
+                    issues.append(f"L{i + 1}: Expected title header")
             case "find_directions":
                 if line.startswith("## Directions"):
                     state = "read_directions"
                 else:
-                    issues.append(f"L{i + 1}: expected directions header")
+                    issues.append(f"L{i + 1}: Expected directions header")
             case "read_directions":
                 if line.startswith("- "):
                     directions.append(line[2:])
-                elif len(directions) == 0:
-                    issues.append(f"L{i + 1}: expected step")
                 else:
                     state = "done"
             case "done":
-                issues.append(f"L{i + 1}: extra line")
+                issues.append(f"L{i + 1}: Extra line")
 
-    if state not in ["done", "read_directions"]:
-        issues.append(f"End: incomplete parse, stopped at {state}")
+    match state:
+        case "find_title":
+            issues.append("End: Missing title")
+        case "find_directions":
+            issues.append("End: Missing directions header")
+    
+    if len(directions) == 0:
+        issues.append("End: Empty directions list")
+
 
     return ParsedResponse(title, directions, issues)
 
