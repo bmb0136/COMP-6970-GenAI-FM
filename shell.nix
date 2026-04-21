@@ -12,9 +12,11 @@ mkShell {
       pp:
       let
         torch = pp.torch.override { inherit cudaSupport; };
+        torchvision = pp.torchvision.override { inherit torch; };
         accelerate = pp.accelerate.override { inherit torch; };
         transformers = pp.transformers.override { inherit torch; };
         trl = pp.trl.override { inherit accelerate transformers; };
+        clip = pp.clip.override { inherit torch torchvision; };
       in
       with pp;
       [
@@ -34,6 +36,7 @@ mkShell {
         trl
         transformers
         accelerate
+        clip
       ]
     ))
   ];
